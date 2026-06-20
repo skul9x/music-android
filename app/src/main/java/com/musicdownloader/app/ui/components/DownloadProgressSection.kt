@@ -44,11 +44,17 @@ fun DownloadProgressSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val statusText = if (progress.totalItems > 0) {
+                    "Downloading item ${progress.currentItem} of ${progress.totalItems}"
+                } else {
+                    "Downloading..."
+                }
                 Text(
-                    text = "Downloading...",
+                    text = statusText,
                     color = Color.White,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag("progress_status")
                 )
 
                 IconButton(

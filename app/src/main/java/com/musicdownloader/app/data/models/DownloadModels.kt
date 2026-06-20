@@ -12,14 +12,18 @@ data class VideoInfo(
     val thumbnailUrl: String,
     val duration: Long,
     val uploader: String,
-    val url: String
+    val url: String,
+    val isPlaylist: Boolean = false,
+    val videoCount: Int = 0
 )
 
 data class DownloadProgress(
     val percent: Float,
     val etaSeconds: Long,
     val speedStr: String,
-    val line: String
+    val line: String,
+    val currentItem: Int = 0,
+    val totalItems: Int = 0
 )
 
 sealed class DownloadUiState {

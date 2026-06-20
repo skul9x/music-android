@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -171,13 +172,16 @@ fun MainScreen(
             }
             is DownloadUiState.Success -> {
                 val info = lastVideoInfo
+                val isPlaylist = info?.isPlaylist == true || com.musicdownloader.app.util.NetworkHelper.isPlaylistUrl(url)
+                val defaultTitle = if (isPlaylist) "Playlist Folder" else "Downloaded File"
                 historyRepository.addItem(
                     DownloadHistoryItem(
-                        title = info?.title ?: "Downloaded File",
+                        title = info?.title ?: defaultTitle,
                         filePath = state.filePath,
                         format = selectedFormat.name.replace("_", " "),
                         timestamp = System.currentTimeMillis(),
-                        thumbnailUrl = info?.thumbnailUrl ?: ""
+                        thumbnailUrl = info?.thumbnailUrl ?: "",
+                        isPlaylist = isPlaylist
                     )
                 )
             }
@@ -497,9 +501,15 @@ fun MainScreen(
                                                         ),
                                                     contentAlignment = Alignment.Center
                                                 ) {
+                                                    val icon = if (item.isPlaylist) {
+                                                        Icons.AutoMirrored.Filled.PlaylistPlay
+                                                    } else {
+                                                        Icons.Default.MusicNote
+                                                    }
+                                                    val contentDesc = if (item.isPlaylist) "Playlist" else "Music"
                                                     Icon(
-                                                        imageVector = Icons.Default.MusicNote,
-                                                        contentDescription = "Music",
+                                                        imageVector = icon,
+                                                        contentDescription = contentDesc,
                                                         tint = Color.White.copy(alpha = 0.5f)
                                                     )
                                                 }

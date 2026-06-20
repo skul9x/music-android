@@ -63,6 +63,7 @@ class DownloadViewModel(
             _uiState.value = DownloadUiState.Error("Invalid URL")
             return
         }
+        val info = (_uiState.value as? DownloadUiState.InfoReady)?.videoInfo
         _uiState.value = DownloadUiState.Downloading(DownloadProgress(0f, 0, "", ""))
         
         if (context != null) {
@@ -71,7 +72,6 @@ class DownloadViewModel(
                 putExtra(DownloadService.EXTRA_URL, url)
                 putExtra(DownloadService.EXTRA_SAVE_PATH, savePath)
                 putExtra(DownloadService.EXTRA_FORMAT, format.name)
-                val info = (_uiState.value as? DownloadUiState.InfoReady)?.videoInfo
                 putExtra(DownloadService.EXTRA_TITLE, info?.title)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

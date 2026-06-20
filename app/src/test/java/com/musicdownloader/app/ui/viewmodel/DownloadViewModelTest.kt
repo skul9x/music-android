@@ -110,6 +110,34 @@ class DownloadViewModelTest {
     }
 
     @Test
+    fun `startDownload preserves title when starting from InfoReady`() = runTest {
+        fakeRepo.videoInfoToReturn = VideoInfo(
+            title = "Test Video",
+            thumbnailUrl = "https://example.com/thumb.jpg",
+            duration = 240,
+            uploader = "TestUser",
+            url = "https://youtube.com/watch?v=test123"
+        )
+        fakeRepo.downloadResultPath = "/storage/downloads/test.m4a"
+
+        viewModel.fetchInfo("https://youtube.com/watch?v=test123")
+        advanceUntilIdle()
+
+        // Assert we are in InfoReady
+        assertTrue(viewModel.uiState.value is DownloadUiState.InfoReady)
+
+        viewModel.startDownload(
+            "https://youtube.com/watch?v=test123",
+            "/storage/downloads",
+            DownloadFormat.M4A_AUDIO
+        )
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue("State should be Success", state is DownloadUiState.Success)
+    }
+
+    @Test
     fun `resetState returns to Idle`() = runTest {
         fakeRepo.downloadResultPath = "/storage/downloads/test.m4a"
         viewModel.startDownload("https://youtube.com/watch?v=t", "/d", DownloadFormat.M4A_AUDIO)

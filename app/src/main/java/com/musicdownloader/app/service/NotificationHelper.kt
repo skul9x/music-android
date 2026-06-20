@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.musicdownloader.app.data.models.DownloadProgress
+import com.musicdownloader.app.util.formatDuration
 
 object NotificationHelper {
     const val CHANNEL_ID = "downloads"
@@ -29,6 +30,33 @@ object NotificationHelper {
         }
     }
 
+    internal fun getProgressContentText(progress: DownloadProgress): String {
+        val progressPercent = progress.percent.toInt()
+        val speedText = progress.speedStr
+        return if (progress.totalItems > 0) {
+            "Downloading item ${progress.currentItem} of ${progress.totalItems} (${progressPercent}%)"
+        } else {
+            if (speedText.isNotEmpty()) {
+                "Downloading: $progressPercent% (${speedText})"
+            } else {
+                "Downloading: $progressPercent%"
+            }
+        }
+    }
+
+    internal fun getProgressSubText(progress: DownloadProgress): String? {
+        val speedText = progress.speedStr
+        if (progress.totalItems > 0 && speedText.isNotEmpty()) {
+            val etaStr = if (progress.etaSeconds > 0) {
+                " • ETA: ${formatDuration(progress.etaSeconds)}"
+            } else {
+                ""
+            }
+            return "$speedText$etaStr"
+        }
+        return null
+    }
+
     fun buildProgressNotification(
         context: Context,
         title: String,
@@ -36,14 +64,10 @@ object NotificationHelper {
         cancelPendingIntent: PendingIntent
     ): Notification {
         val progressPercent = progress.percent.toInt()
-        val speedText = progress.speedStr
-        val contentText = if (speedText.isNotEmpty()) {
-            "Downloading: $progressPercent% (${speedText})"
-        } else {
-            "Downloading: $progressPercent%"
-        }
+        val contentText = getProgressContentText(progress)
+        val subText = getProgressSubText(progress)
 
-        return NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(contentText)
             .setSmallIcon(android.R.drawable.stat_sys_download)
@@ -55,7 +79,12 @@ object NotificationHelper {
                 "Cancel",
                 cancelPendingIntent
             )
-            .build()
+
+        if (subText != null) {
+            builder.setSubText(subText)
+        }
+
+        return builder.build()
     }
 
     fun buildSuccessNotification(

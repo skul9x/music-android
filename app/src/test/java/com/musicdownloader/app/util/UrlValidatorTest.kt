@@ -10,6 +10,9 @@ class UrlValidatorTest {
         assertTrue(UrlValidator.isSupported("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
         assertTrue(UrlValidator.isSupported("https://youtu.be/dQw4w9WgXcQ"))
         assertTrue(UrlValidator.isSupported("https://m.youtube.com/watch?v=abc123"))
+        assertTrue(UrlValidator.isSupported("https://www.youtube.com/playlist?list=PLxyz"))
+        assertTrue(UrlValidator.isSupported("https://m.youtube.com/playlist?list=PLxyz"))
+        assertTrue(UrlValidator.isSupported("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxyz"))
     }
 
     @Test

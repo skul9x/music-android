@@ -5,5 +5,6 @@ data class DownloadHistoryItem(
     val filePath: String,
     val format: String,
     val timestamp: Long,
-    val thumbnailUrl: String
+    val thumbnailUrl: String,
+    val isPlaylist: Boolean = false
 )

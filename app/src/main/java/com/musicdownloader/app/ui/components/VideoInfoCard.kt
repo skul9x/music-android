@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -78,14 +82,53 @@ fun VideoInfoCard(
                     modifier = Modifier.testTag("video_uploader")
                 )
 
-                Text(
-                    text = formatDuration(videoInfo.duration),
-                    color = Color(0xFFF27121),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag("video_duration")
-                )
+                if (videoInfo.isPlaylist) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.testTag("playlist_info_row")
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.PlaylistPlay,
+                            contentDescription = "Playlist Icon",
+                            tint = Color(0xFFE94057),
+                            modifier = Modifier
+                                .size(20.dp)
+                                .testTag("playlist_icon")
+                        )
+                        Text(
+                            text = "${videoInfo.videoCount} videos",
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.testTag("video_count_text")
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Surface(
+                            color = Color(0xFFE94057),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.testTag("playlist_badge")
+                        ) {
+                            Text(
+                                text = "PLAYLIST",
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = formatDuration(videoInfo.duration),
+                        color = Color(0xFFF27121),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.testTag("video_duration")
+                    )
+                }
             }
         }
     }
 }
+

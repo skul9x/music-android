@@ -20,6 +20,11 @@ Với giao diện được thiết kế theo phong cách **Glassmorphism (kính 
 
 ## 🚀 Tính năng nổi bật
 
+- **Tải trọn bộ Playlist YouTube:**
+  - Hỗ trợ phân tích và tải toàn bộ danh sách phát (Playlist) từ YouTube bằng link trực tiếp hoặc link video nằm trong danh sách phát.
+  - Tự động hiển thị thông tin playlist (tên danh sách, số lượng video, người tạo).
+  - Tải tuần tự (sequential download) toàn bộ danh sách thông qua dịch vụ chạy ngầm (Foreground Service).
+  - Trực quan hóa tiến trình tải hàng loạt theo dạng "Đang tải video X trên Y" (Downloading item X of Y) đồng bộ thời gian thực trên giao diện và thanh thông báo.
 - **Tải đa dạng định dạng:**
   - **M4A Audio:** Tải nhạc chất lượng cao và tự động tải ảnh bìa (Cover Art) từ video nguồn, sau đó nhúng trực tiếp vào metadata của file âm thanh.
   - **Video (1080p, 720p, Best Quality):** Tải video độ phân giải cao, tự động ghép hình và tiếng chất lượng cao nhất bằng FFmpeg nội bộ.
