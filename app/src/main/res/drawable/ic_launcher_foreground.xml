@@ -1,0 +1,63 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  
+  <!-- Concentric decorative music rings -->
+  <path
+      android:pathData="M54,54m-38,0a38,38 0,1 1,76 0a38,38 0,1 1,-76 0"
+      android:strokeWidth="1.5"
+      android:strokeColor="#FFFFFF"
+      android:strokeAlpha="0.1"
+      android:fillColor="#00000000" />
+  
+  <path
+      android:pathData="M54,54m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0"
+      android:strokeWidth="1"
+      android:strokeColor="#FFFFFF"
+      android:strokeAlpha="0.06"
+      android:fillColor="#00000000" />
+
+  <!-- Double Music Note -->
+  <!-- Left note head -->
+  <path
+      android:pathData="M44,61c2.2,0.6 3.4,2.5 2.8,4.3s-2.8,2.7 -5,2.1s-3.4,-2.5 -2.8,-4.3s2.8,-2.7 5,-2.1z"
+      android:fillColor="#FFFFFF" />
+
+  <!-- Right note head -->
+  <path
+      android:pathData="M66,53c2.2,0.6 3.4,2.5 2.8,4.3s-2.8,2.7 -5,2.1s-3.4,-2.5 -2.8,-4.3s2.8,-2.7 5,-2.1z"
+      android:fillColor="#FFFFFF" />
+
+  <!-- Note Stems & Beam (unified path) -->
+  <path
+      android:pathData="M45,35h3v27h-3z M67,27h3v27h-3z M45,35l25,-9v8l-25,9z"
+      android:fillColor="#FFFFFF" />
+
+  <!-- Download Badge Circle -->
+  <path
+      android:pathData="M60,75m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:fillColor="#FFFFFF" />
+
+  <!-- Download Arrow inside Badge -->
+  <path
+      android:pathData="M60,69v8"
+      android:strokeWidth="2.2"
+      android:strokeColor="#FFE94057"
+      android:strokeLineCap="round" />
+  <path
+      android:pathData="M56,73.5l4,4.5l4,-4.5"
+      android:strokeWidth="2.2"
+      android:strokeColor="#FFE94057"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"
+      android:fillColor="#00000000" />
+  <path
+      android:pathData="M55.5,81.5c1.5,0.8 7.5,0.8 9,0"
+      android:strokeWidth="1.8"
+      android:strokeColor="#FFE94057"
+      android:strokeLineCap="round"
+      android:fillColor="#00000000" />
+      
+</vector>

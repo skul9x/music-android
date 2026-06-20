@@ -5,7 +5,7 @@ object UrlValidator {
         Regex("https?://(www\\.)?youtube\\.com/watch\\?v=.+"),
         Regex("https?://youtu\\.be/.+"),
         Regex("https?://m\\.youtube\\.com/watch\\?v=.+"),
-        Regex("https?://(www\\.|vm\\.)?tiktok\\.com/.+"),
+        Regex("https?://(www\\.|vm\\.|vt\\.)?tiktok\\.com/.+"),
     )
 
     fun isSupported(url: String): Boolean {

@@ -16,6 +16,7 @@ class UrlValidatorTest {
     fun `valid tiktok URL returns true`() {
         assertTrue(UrlValidator.isSupported("https://www.tiktok.com/@user/video/1234567890"))
         assertTrue(UrlValidator.isSupported("https://vm.tiktok.com/ABC123/"))
+        assertTrue(UrlValidator.isSupported("https://vt.tiktok.com/ZSQ39dfhP/"))
     }
 
     @Test
