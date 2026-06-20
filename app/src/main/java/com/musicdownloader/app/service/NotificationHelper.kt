@@ -33,6 +33,16 @@ object NotificationHelper {
     internal fun getProgressContentText(progress: DownloadProgress): String {
         val progressPercent = progress.percent.toInt()
         val speedText = progress.speedStr
+        val postProcessStatus = progress.getPostProcessingStatus()
+
+        if (postProcessStatus != null) {
+            return if (progress.totalItems > 0) {
+                "Item ${progress.currentItem} of ${progress.totalItems}: $postProcessStatus"
+            } else {
+                postProcessStatus
+            }
+        }
+
         return if (progress.totalItems > 0) {
             "Downloading item ${progress.currentItem} of ${progress.totalItems} (${progressPercent}%)"
         } else {
@@ -45,6 +55,9 @@ object NotificationHelper {
     }
 
     internal fun getProgressSubText(progress: DownloadProgress): String? {
+        if (progress.getPostProcessingStatus() != null) {
+            return "Post-processing..."
+        }
         val speedText = progress.speedStr
         if (progress.totalItems > 0 && speedText.isNotEmpty()) {
             val etaStr = if (progress.etaSeconds > 0) {
@@ -66,12 +79,13 @@ object NotificationHelper {
         val progressPercent = progress.percent.toInt()
         val contentText = getProgressContentText(progress)
         val subText = getProgressSubText(progress)
+        val isIndeterminate = progress.percent < 0 || progress.getPostProcessingStatus() != null
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(contentText)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setProgress(100, progressPercent, progress.percent < 0)
+            .setProgress(100, progressPercent, isIndeterminate)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .addAction(

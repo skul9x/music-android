@@ -39,36 +39,52 @@ fun DownloadProgressSection(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val postProcessStatus = progress.getPostProcessingStatus()
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val statusText = if (progress.totalItems > 0) {
-                    "Downloading item ${progress.currentItem} of ${progress.totalItems}"
+            val statusText = if (postProcessStatus != null) {
+                if (progress.totalItems > 0) {
+                    "Item ${progress.currentItem} of ${progress.totalItems}: $postProcessStatus"
                 } else {
-                    "Downloading..."
+                    postProcessStatus
                 }
-                Text(
-                    text = statusText,
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.testTag("progress_status")
-                )
-
-                IconButton(
-                    onClick = onCancelClick,
-                    modifier = Modifier.testTag("cancel_button")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel Download",
-                        tint = Color.White.copy(alpha = 0.8f)
-                    )
-                }
+            } else if (progress.totalItems > 0) {
+                "Downloading item ${progress.currentItem} of ${progress.totalItems}"
+            } else {
+                "Downloading..."
             }
+            Text(
+                text = statusText,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.testTag("progress_status")
+            )
 
+            IconButton(
+                onClick = onCancelClick,
+                modifier = Modifier.testTag("cancel_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Cancel Download",
+                    tint = Color.White.copy(alpha = 0.8f)
+                )
+            }
+        }
+
+        if (postProcessStatus != null || progress.percent < 0) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("progress_bar"),
+                color = Color(0xFFE94057),
+                trackColor = Color.White.copy(alpha = 0.1f)
+            )
+        } else {
             val progressFraction = (progress.percent / 100f).coerceIn(0f, 1f)
             LinearProgressIndicator(
                 progress = { progressFraction },
@@ -78,38 +94,51 @@ fun DownloadProgressSection(
                 color = Color(0xFFE94057),
                 trackColor = Color.White.copy(alpha = 0.1f)
             )
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "${progress.percent.toInt()}%",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag("progress_percentage")
-                )
-
-                Text(
-                    text = progress.speedStr,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 14.sp,
-                    modifier = Modifier.testTag("progress_speed")
-                )
-
-                val etaStr = if (progress.etaSeconds > 0) {
-                    "ETA: ${formatDuration(progress.etaSeconds)}"
-                } else {
-                    "ETA: --:--"
-                }
-                Text(
-                    text = etaStr,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 14.sp,
-                    modifier = Modifier.testTag("progress_eta")
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            val percentText = if (postProcessStatus != null) {
+                "--%"
+            } else {
+                "${progress.percent.toInt()}%"
             }
+            Text(
+                text = percentText,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.testTag("progress_percentage")
+            )
+
+            val speedText = if (postProcessStatus != null) {
+                "Processing"
+            } else {
+                progress.speedStr
+            }
+            Text(
+                text = speedText,
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 14.sp,
+                modifier = Modifier.testTag("progress_speed")
+            )
+
+            val etaStr = if (postProcessStatus != null) {
+                "ETA: --:--"
+            } else if (progress.etaSeconds > 0) {
+                "ETA: ${formatDuration(progress.etaSeconds)}"
+            } else {
+                "ETA: --:--"
+            }
+            Text(
+                text = etaStr,
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 14.sp,
+                modifier = Modifier.testTag("progress_eta")
+            )
+        }
         }
     }
 }

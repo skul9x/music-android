@@ -24,7 +24,18 @@ data class DownloadProgress(
     val line: String,
     val currentItem: Int = 0,
     val totalItems: Int = 0
-)
+) {
+    fun getPostProcessingStatus(): String? {
+        return when {
+            line.contains("[ExtractAudio]", ignoreCase = true) -> "Converting to audio..."
+            line.contains("[EmbedThumbnail]", ignoreCase = true) -> "Embedding Cover Art..."
+            line.contains("[ffmpeg] Merging", ignoreCase = true) -> "Merging audio and video..."
+            line.contains("[ffmpeg] Correcting container", ignoreCase = true) -> "Optimizing file format..."
+            line.contains("[Metadata]", ignoreCase = true) -> "Embedding metadata..."
+            else -> null
+        }
+    }
+}
 
 sealed class DownloadUiState {
     object Idle : DownloadUiState()
