@@ -1,6 +1,7 @@
 package com.musicdownloader.app.ui.screens
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,6 +36,8 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
 ) {
+    BackHandler(onBack = onNavigateBack)
+
     val context = LocalContext.current
     val settings by viewModel.settingsState.collectAsState()
     val updateUiState by viewModel.updateState.collectAsState()
