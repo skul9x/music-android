@@ -2,6 +2,8 @@ package com.musicdownloader.app.ui.viewmodel
 
 import com.musicdownloader.app.data.models.*
 import com.musicdownloader.app.data.repository.FakeDownloadRepository
+import com.musicdownloader.app.data.repository.HistoryRepository
+import com.musicdownloader.app.data.repository.InMemoryHistoryPersistence
 import com.musicdownloader.app.util.LibraryInitializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +17,7 @@ import org.junit.Test
 class DownloadViewModelTest {
 
     private lateinit var fakeRepo: FakeDownloadRepository
+    private lateinit var historyRepo: HistoryRepository
     private lateinit var viewModel: DownloadViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -22,7 +25,8 @@ class DownloadViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeRepo = FakeDownloadRepository()
-        viewModel = DownloadViewModel(fakeRepo)
+        historyRepo = HistoryRepository(InMemoryHistoryPersistence())
+        viewModel = DownloadViewModel(fakeRepo, historyRepo)
     }
 
     @After
@@ -153,5 +157,56 @@ class DownloadViewModelTest {
     fun `isLibraryReady and libraryError match LibraryInitializer state`() {
         assertEquals(LibraryInitializer.isInitialized.value, viewModel.isLibraryReady.value)
         assertEquals(LibraryInitializer.initError.value, viewModel.libraryError.value)
+    }
+
+    @Test
+    fun `startDownload records history item automatically in HistoryRepository on success`() = runTest {
+        fakeRepo.videoInfoToReturn = VideoInfo(
+            title = "Awesome Song",
+            thumbnailUrl = "https://example.com/song.jpg",
+            duration = 180,
+            uploader = "ArtistName",
+            url = "https://youtube.com/watch?v=awesome"
+        )
+        fakeRepo.downloadResultPath = "/storage/downloads/awesome.m4a"
+
+        viewModel.fetchInfo("https://youtube.com/watch?v=awesome")
+        advanceUntilIdle()
+
+        viewModel.startDownload(
+            "https://youtube.com/watch?v=awesome",
+            "/storage/downloads",
+            DownloadFormat.M4A_AUDIO
+        )
+        advanceUntilIdle()
+
+        val history = viewModel.historyFlow.value
+        assertEquals(1, history.size)
+        val item = history[0]
+        assertEquals("Awesome Song", item.title)
+        assertEquals("/storage/downloads/awesome.m4a", item.filePath)
+        assertEquals("M4A AUDIO", item.format)
+        assertEquals("https://example.com/song.jpg", item.thumbnailUrl)
+        assertFalse(item.isPlaylist)
+    }
+
+    @Test
+    fun `clearHistory delegates call to HistoryRepository`() = runTest {
+        historyRepo.addItem(
+            DownloadHistoryItem(
+                title = "Test",
+                filePath = "/path/test.mp3",
+                format = "MP3",
+                timestamp = System.currentTimeMillis(),
+                thumbnailUrl = "",
+                isPlaylist = false
+            )
+        )
+        assertEquals(1, viewModel.historyFlow.value.size)
+
+        viewModel.clearHistory()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.historyFlow.value.isEmpty())
     }
 }

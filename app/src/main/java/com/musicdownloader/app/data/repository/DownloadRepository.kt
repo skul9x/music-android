@@ -18,6 +18,7 @@ class DownloadRepository : IDownloadRepository {
             val request = YoutubeDLRequest(url).apply {
                 addOption("--flat-playlist")
                 addOption("--dump-single-json")
+                addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
             }
             val response = YoutubeDL.getInstance().execute(request)
             val jsonString = response.out
@@ -26,6 +27,7 @@ class DownloadRepository : IDownloadRepository {
         } else {
             val request = YoutubeDLRequest(url).apply {
                 addOption("--no-playlist")
+                addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
             }
             val ytInfo = YoutubeDL.getInstance().getInfo(request)
             VideoInfo(
@@ -56,6 +58,7 @@ class DownloadRepository : IDownloadRepository {
                 addOption("--no-playlist")
             }
             addOption("--newline")
+            addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
             
             when (format) {
                 DownloadFormat.M4A_AUDIO -> {

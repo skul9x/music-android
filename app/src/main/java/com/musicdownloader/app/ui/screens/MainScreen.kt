@@ -48,8 +48,7 @@ import com.musicdownloader.app.data.models.DownloadFormat
 import com.musicdownloader.app.data.models.DownloadHistoryItem
 import com.musicdownloader.app.data.models.DownloadUiState
 import com.musicdownloader.app.data.models.VideoInfo
-import com.musicdownloader.app.data.repository.HistoryRepository
-import com.musicdownloader.app.data.repository.SettingsRepository
+import com.musicdownloader.app.ui.viewmodel.SettingsViewModel
 import com.musicdownloader.app.ui.components.DownloadErrorCard
 import com.musicdownloader.app.ui.components.DownloadProgressSection
 import com.musicdownloader.app.ui.components.DownloadSuccessCard
@@ -68,6 +67,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     viewModel: DownloadViewModel,
+    settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
     onNavigateToSettings: () -> Unit = {}
 ) {
@@ -78,12 +78,11 @@ fun MainScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val settingsRepository = remember { SettingsRepository(context) }
-    val settings by settingsRepository.settingsFlow.collectAsState(initial = settingsRepository.getSettings())
+    val settings by settingsViewModel.settingsState.collectAsState()
 
     var url by rememberSaveable { mutableStateOf("") }
     var selectedFormat by rememberSaveable { mutableStateOf(DownloadFormat.M4A_AUDIO) }
-    var savePath by rememberSaveable { mutableStateOf(StorageHelper.getSavePath(context)) }
+    var savePath by rememberSaveable { mutableStateOf(settings.defaultSavePath) }
 
     // Sync savePath and defaultFormat from settings repository
     LaunchedEffect(settings) {
@@ -105,10 +104,8 @@ fun MainScreen(
         }
     }
 
-    // History and video info caching
-    val historyRepository = remember { HistoryRepository.getInstance() }
-    val historyList by historyRepository.historyFlow.collectAsState()
-    var lastVideoInfo by remember { mutableStateOf<VideoInfo?>(null) }
+    // History Flow from ViewModel
+    val historyList by viewModel.historyFlow.collectAsState()
 
     val folderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -122,8 +119,7 @@ fun MainScreen(
             }
             val physicalPath = StorageHelper.getPhysicalPathFromUri(context, it)
             val path = physicalPath ?: StorageHelper.getDefaultDownloadPath()
-            StorageHelper.setSavePath(context, path)
-            savePath = path
+            settingsViewModel.updateDefaultSavePath(path)
         }
     }
 
@@ -163,31 +159,10 @@ fun MainScreen(
     )
 
     LaunchedEffect(uiState) {
-        when (val state = uiState) {
-            is DownloadUiState.Cancelled -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar("Download cancelled")
-                }
+        if (uiState is DownloadUiState.Cancelled) {
+            scope.launch {
+                snackbarHostState.showSnackbar("Download cancelled")
             }
-            is DownloadUiState.InfoReady -> {
-                lastVideoInfo = state.videoInfo
-            }
-            is DownloadUiState.Success -> {
-                val info = lastVideoInfo
-                val isPlaylist = info?.isPlaylist == true || com.musicdownloader.app.util.NetworkHelper.isPlaylistUrl(url)
-                val defaultTitle = if (isPlaylist) "Playlist Folder" else "Downloaded File"
-                historyRepository.addItem(
-                    DownloadHistoryItem(
-                        title = info?.title ?: defaultTitle,
-                        filePath = state.filePath,
-                        format = selectedFormat.name.replace("_", " "),
-                        timestamp = System.currentTimeMillis(),
-                        thumbnailUrl = info?.thumbnailUrl ?: "",
-                        isPlaylist = isPlaylist
-                    )
-                )
-            }
-            else -> {}
         }
     }
 
@@ -493,7 +468,7 @@ fun MainScreen(
                                     )
                                 } else {
                                     Button(
-                                        onClick = { historyRepository.clearHistory() },
+                                        onClick = { viewModel.clearHistory() },
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color.White.copy(alpha = 0.1f)
                                         ),

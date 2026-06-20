@@ -25,6 +25,7 @@ fun AppNavigation(
         Screen.MAIN -> {
             MainScreen(
                 viewModel = downloadViewModel,
+                settingsViewModel = settingsViewModel,
                 onNavigateToSettings = { currentScreen = Screen.SETTINGS }
             )
         }

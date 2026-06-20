@@ -100,7 +100,7 @@ fun DownloadProgressSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val percentText = if (postProcessStatus != null) {
+            val percentText = if (postProcessStatus != null || progress.percent < 0) {
                 "--%"
             } else {
                 "${progress.percent.toInt()}%"

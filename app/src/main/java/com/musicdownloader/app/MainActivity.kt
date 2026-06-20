@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.musicdownloader.app.data.repository.DownloadRepository
+import com.musicdownloader.app.data.repository.HistoryRepository
 import com.musicdownloader.app.ui.navigation.AppNavigation
 import com.musicdownloader.app.ui.theme.MusicDownloaderTheme
 import com.musicdownloader.app.ui.viewmodel.DownloadViewModel
@@ -20,7 +21,10 @@ class MainActivity : ComponentActivity() {
         val downloadViewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return DownloadViewModel(DownloadRepository()) as T
+                return DownloadViewModel(
+                    DownloadRepository(),
+                    HistoryRepository.getInstance(applicationContext)
+                ) as T
             }
         }
         val downloadViewModel: DownloadViewModel by viewModels { downloadViewModelFactory }
