@@ -2,6 +2,7 @@ package com.musicdownloader.app.ui.viewmodel
 
 import com.musicdownloader.app.data.models.*
 import com.musicdownloader.app.data.repository.FakeDownloadRepository
+import com.musicdownloader.app.util.LibraryInitializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -146,5 +147,11 @@ class DownloadViewModelTest {
         viewModel.resetState()
 
         assertEquals(DownloadUiState.Idle, viewModel.uiState.value)
+    }
+
+    @Test
+    fun `isLibraryReady and libraryError match LibraryInitializer state`() {
+        assertEquals(LibraryInitializer.isInitialized.value, viewModel.isLibraryReady.value)
+        assertEquals(LibraryInitializer.initError.value, viewModel.libraryError.value)
     }
 }

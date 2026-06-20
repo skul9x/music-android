@@ -1,5 +1,5 @@
 # Phase 02: Throttling Progress Updates
-Status: ⬜ Pending
+Status: ✅ Completed
 Dependencies: [Phase 01](file:///d:/skul9x/music-android-main/plans/260620-1925-fix-critical-performance/phase-01-async-init.md)
 
 ## Objective
@@ -14,7 +14,7 @@ Dependencies: [Phase 01](file:///d:/skul9x/music-android-main/plans/260620-1925-
 - Performance: Giảm số lượng cập nhật UI Recomposition và Notification Manager đi 90%. Không gây lag giao diện khi tải tốc độ cao.
 
 ## Implementation Steps
-1. [ ] **Cập nhật** `DownloadRepository.kt`:
+1. [x] **Cập nhật** `DownloadRepository.kt`:
    - Khai báo biến `lastUpdateTime` và `throttleInterval = 500L` trong phương thức `download`.
    - Trong JNI callback của `YoutubeDL.getInstance().execute`:
      - Kiểm tra nếu `currentItem` thay đổi so với giá trị cũ (chỉ dấu chuyển bài trong playlist).

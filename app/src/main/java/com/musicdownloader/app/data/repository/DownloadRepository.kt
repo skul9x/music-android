@@ -80,6 +80,12 @@ class DownloadRepository : IDownloadRepository {
         var totalItems = 0
         val itemRegex = Regex("\\[download\\] Downloading item (\\d+) of (\\d+)")
 
+        var lastUpdateTime = 0L
+        val throttleInterval = 500L
+        var lastCurrentItem = 0
+        var lastPercent = -1f
+        var lastPostProcessingStatus: String? = null
+
         val response = YoutubeDL.getInstance().execute(request, activeProcessIdKey) { progress, eta, line ->
             val speedStr = extractSpeed(line)
             val match = itemRegex.find(line)
@@ -87,16 +93,38 @@ class DownloadRepository : IDownloadRepository {
                 currentItem = match.groupValues[1].toIntOrNull() ?: currentItem
                 totalItems = match.groupValues[2].toIntOrNull() ?: totalItems
             }
-            onProgress(
-                DownloadProgress(
-                    percent = progress,
-                    etaSeconds = eta,
-                    speedStr = speedStr,
-                    line = line,
-                    currentItem = currentItem,
-                    totalItems = totalItems
-                )
+            
+            val tempProgress = DownloadProgress(
+                percent = progress,
+                etaSeconds = eta,
+                speedStr = speedStr,
+                line = line,
+                currentItem = currentItem,
+                totalItems = totalItems
             )
+            
+            val currentPostProcessingStatus = tempProgress.getPostProcessingStatus()
+            val currentTime = System.currentTimeMillis()
+            
+            val isTrigger = shouldTriggerUpdate(
+                progress = progress,
+                currentItem = currentItem,
+                currentPostProcessingStatus = currentPostProcessingStatus,
+                currentTime = currentTime,
+                lastUpdateTime = lastUpdateTime,
+                throttleInterval = throttleInterval,
+                lastCurrentItem = lastCurrentItem,
+                lastPercent = lastPercent,
+                lastPostProcessingStatus = lastPostProcessingStatus
+            )
+            
+            if (isTrigger) {
+                onProgress(tempProgress)
+                lastUpdateTime = currentTime
+                lastCurrentItem = currentItem
+                lastPercent = progress
+                lastPostProcessingStatus = currentPostProcessingStatus
+            }
         }
 
         val filePath = if (isPlaylist) {
@@ -117,6 +145,25 @@ class DownloadRepository : IDownloadRepository {
         } catch (e: Exception) {
             // Ignore
         }
+    }
+
+    internal fun shouldTriggerUpdate(
+        progress: Float,
+        currentItem: Int,
+        currentPostProcessingStatus: String?,
+        currentTime: Long,
+        lastUpdateTime: Long,
+        throttleInterval: Long,
+        lastCurrentItem: Int,
+        lastPercent: Float,
+        lastPostProcessingStatus: String?
+    ): Boolean {
+        val isStart = progress == 0f && lastPercent != 0f
+        val isEnd = progress == 100f && lastPercent != 100f
+        val isItemChanged = currentItem != lastCurrentItem
+        val isPostProcessingChanged = currentPostProcessingStatus != null && currentPostProcessingStatus != lastPostProcessingStatus
+        val isTimeThresholdMet = (currentTime - lastUpdateTime) >= throttleInterval
+        return isStart || isEnd || isItemChanged || isPostProcessingChanged || isTimeThresholdMet
     }
 
     internal fun extractSpeed(line: String): String {

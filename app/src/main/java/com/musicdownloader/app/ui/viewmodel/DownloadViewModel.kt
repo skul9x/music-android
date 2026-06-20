@@ -11,6 +11,7 @@ import com.musicdownloader.app.data.models.DownloadUiState
 import com.musicdownloader.app.data.repository.IDownloadRepository
 import com.musicdownloader.app.service.DownloadService
 import com.musicdownloader.app.service.DownloadServiceBridge
+import com.musicdownloader.app.util.LibraryInitializer
 import com.musicdownloader.app.util.UrlValidator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -22,6 +23,9 @@ import kotlinx.coroutines.launch
 class DownloadViewModel(
     private val repository: IDownloadRepository
 ) : ViewModel() {
+
+    val isLibraryReady: StateFlow<Boolean> = LibraryInitializer.isInitialized
+    val libraryError: StateFlow<String?> = LibraryInitializer.initError
 
     private val _uiState = MutableStateFlow<DownloadUiState>(DownloadUiState.Idle)
     val uiState: StateFlow<DownloadUiState> = _uiState.asStateFlow()

@@ -73,6 +73,8 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val isLibraryReady by viewModel.isLibraryReady.collectAsState()
+    val libraryError by viewModel.libraryError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -352,6 +354,34 @@ fun MainScreen(
                             )
                         }
 
+                        if (libraryError != null) {
+                            Text(
+                                text = "Initialization error: $libraryError",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        } else if (!isLibraryReady) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    color = Color(0xFFE94057),
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Preparing download engine...",
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         GlassButton(
@@ -375,7 +405,7 @@ fun MainScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("download_button"),
-                            enabled = isEnabled && url.isNotBlank()
+                            enabled = isEnabled && url.isNotBlank() && isLibraryReady
                         )
                     }
 

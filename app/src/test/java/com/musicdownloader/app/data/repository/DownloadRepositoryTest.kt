@@ -58,4 +58,128 @@ class DownloadRepositoryTest {
         val normalizedPath = playlistPath.replace('\\', '/')
         assertEquals("/downloads/My Playlist", normalizedPath)
     }
+    @Test
+    fun `test shouldTriggerUpdate scenarios`() {
+        val repo = DownloadRepository()
+
+        // 1. First 0% progress starts the download immediately
+        assertTrue(
+            repo.shouldTriggerUpdate(
+                progress = 0f,
+                currentItem = 1,
+                currentPostProcessingStatus = null,
+                currentTime = 1000L,
+                lastUpdateTime = 0L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = -1f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 2. Subsequent 0% progress within throttle interval does not trigger
+        assertFalse(
+            repo.shouldTriggerUpdate(
+                progress = 0f,
+                currentItem = 1,
+                currentPostProcessingStatus = null,
+                currentTime = 1200L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 0f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 3. Normal progress update within throttle interval does not trigger
+        assertFalse(
+            repo.shouldTriggerUpdate(
+                progress = 50f,
+                currentItem = 1,
+                currentPostProcessingStatus = null,
+                currentTime = 1200L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 0f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 4. Normal progress update outside throttle interval triggers
+        assertTrue(
+            repo.shouldTriggerUpdate(
+                progress = 50f,
+                currentItem = 1,
+                currentPostProcessingStatus = null,
+                currentTime = 1600L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 0f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 5. 100% progress triggers immediately regardless of time
+        assertTrue(
+            repo.shouldTriggerUpdate(
+                progress = 100f,
+                currentItem = 1,
+                currentPostProcessingStatus = null,
+                currentTime = 1050L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 50f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 6. Playlist item changed triggers immediately
+        assertTrue(
+            repo.shouldTriggerUpdate(
+                progress = 0f,
+                currentItem = 2,
+                currentPostProcessingStatus = null,
+                currentTime = 1050L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 100f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 7. Post-processing start/change triggers immediately
+        assertTrue(
+            repo.shouldTriggerUpdate(
+                progress = 100f,
+                currentItem = 1,
+                currentPostProcessingStatus = "Converting to audio...",
+                currentTime = 1050L,
+                lastUpdateTime = 1000L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 100f,
+                lastPostProcessingStatus = null
+            )
+        )
+
+        // 8. Same post-processing status within throttle interval does not trigger
+        assertFalse(
+            repo.shouldTriggerUpdate(
+                progress = 100f,
+                currentItem = 1,
+                currentPostProcessingStatus = "Converting to audio...",
+                currentTime = 1200L,
+                lastUpdateTime = 1050L,
+                throttleInterval = 500L,
+                lastCurrentItem = 1,
+                lastPercent = 100f,
+                lastPostProcessingStatus = "Converting to audio..."
+            )
+        )
+    }
 }

@@ -41,6 +41,11 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -68,6 +73,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("org.json:json:20240303")
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
